@@ -12,7 +12,7 @@
     
     <!-- Chosen Palette: Calm Harmony (Stone, Slate, Amber, Sky) -->
     <!-- Application Structure Plan: The SPA uses a two-column, interconnected dashboard structure. The left column allows users to select a metric category, then a specific metric. The right column dynamically updates to show the consultant's influence on the selected metric, including a radar chart visualizing the impact area. This structure was chosen to transform the report's linear information into an interactive cause-and-effect exploration, directly linking a business goal (the metric) to the consultant's value proposition (the influence), which is the core message of the source material. -->
-    <!-- Visualization & Content Choices: Report Info -> Key business metrics and consultant roles. Goal -> Show the relationship between metrics and consultant actions. Viz/Presentation Method -> Interactive lists for metrics (HTML/Tailwind/JS) and a dynamic content panel for influence points. A Radar Chart (Chart.js/Canvas) is used to visually summarize which primary business area (Growth, Satisfaction, Operations) a selected metric and the corresponding consultant actions most affect. Interaction -> User clicks a metric, the influence panel and radar chart update instantly. Justification -> This interactive model is more engaging and informative than static text, allowing users to explore the connections at their own pace. Library/Method -> Chart.js for visualization and Vanilla JS for all interactions and DOM manipulation. -->
+    <!-- Visualization & Content Choices: Report Info -> Key business metrics and consultant roles. Goal -> Show the relationship between metrics and consultant actions. Viz/Presentation Method -> Interactive lists for metrics (HTML/Tailwind/JS) and a dynamic content panel for influence points. A Radar Chart (Chart.js/Canvas) is used to visually summarize which primary business area (Growth, Profitability, Experiences, Sustainability) a selected metric and the corresponding consultant actions most affect. Interaction -> User clicks a metric, the influence panel and radar chart update instantly. Justification -> This interactive model is more engaging and informative than static text, allowing users to explore the connections at their own pace. Library/Method -> Chart.js for visualization and Vanilla JS for all interactions and DOM manipulation. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <style>
@@ -57,7 +57,7 @@
                 <h2 class="text-2xl font-bold text-slate-800 mb-4">1. Explore Business Metrics</h2>
                 <p class="mb-6 text-slate-600">Select a category to reveal its key metrics. Then, choose a specific metric to see the consultant's impact.</p>
 
-                <div id="category-selector" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                <div id="category-selector" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
                     <!-- Category buttons will be inserted here by JS -->
                 </div>
                 
@@ -88,144 +88,131 @@
 
 <script>
 const appData = {
-    sales: {
-        id: 'sales',
-        title: 'Sales & Growth',
-        icon: '📈',
+    outgrow_competition: {
+        id: 'outgrow_competition',
+        title: 'Outgrow the Competition',
+        icon: '🚀',
         metrics: {
-            arr_mrr: {
-                name: 'ARR / MRR',
-                description: "Ensures full utilization of Genesys functionalities, maximizing client ROI and increasing the likelihood of renewal.",
+            genesys_cloud_arr: {
+                name: 'Genesys Cloud ARR',
+                description: "Consultant ensures optimal adoption and expansion of Genesys Cloud services, directly contributing to recurring revenue growth.",
                 influence: [
-                    "Drives product adoption and showcases value",
-                    "Develops long-term strategic roadmaps with the client",
-                    "Ensures initial implementation meets and exceeds expectations"
+                    "Accelerates cloud migration and adoption",
+                    "Identifies expansion opportunities within existing deployments",
+                    "Ensures continuous value realization from cloud features"
                 ],
-                impactScores: [10, 6, 4]
+                impactScores: [10, 6, 4, 3]
             },
-            cltv: {
-                name: 'Customer Lifetime Value (CLTV)',
-                description: "By understanding client needs, the consultant identifies and communicates opportunities to expand the use of Genesys solutions.",
+            total_revenue: {
+                name: 'Total Revenue',
+                description: "Through strategic implementations and value realization, consultants help clients maximize their investment in Genesys solutions, leading to increased overall revenue for Genesys.",
                 influence: [
-                    "Identifies up-sell and cross-sell opportunities",
-                    "Fosters a strategic partnership, increasing customer loyalty",
-                    "Helps clients scale their operations using more platform features"
+                    "Drives successful project completion, enabling invoicing",
+                    "Identifies new business opportunities within client accounts",
+                    "Ensures client satisfaction leading to renewals and expansions"
                 ],
-                impactScores: [10, 8, 2]
+                impactScores: [9, 7, 5, 4]
             },
-            churn: {
-                name: 'Churn Rate',
-                description: "Provides proactive support and effective solutions that address client pain points, improving satisfaction and reducing churn.",
+            gross_acv_bookings: {
+                name: 'Gross ACV Bookings',
+                description: "Consultants contribute to new sales and expansions by providing expert pre-sales support, solution design, and demonstrating clear ROI.",
                 influence: [
-                    "Proactively resolves technical and strategic challenges",
-                    "Ensures the solution continuously delivers value",
-                    "Acts as a trusted advisor, strengthening the client relationship"
+                    "Supports sales with compelling solution architectures",
+                    "Provides technical validation and proof-of-concept",
+                    "Helps define clear business cases and expected ROI for new deals"
                 ],
-                impactScores: [8, 10, 2]
+                impactScores: [10, 5, 3, 2]
             },
-            renewal: {
-                name: 'Renewal Rate',
-                description: "Reflects customer satisfaction and the continuous value delivered by the platform, heavily influenced by consultant engagement.",
+            customers_gt_1m_arr: {
+                name: 'Customers > $1M ARR',
+                description: "Focuses on nurturing large accounts, ensuring their continued success and expansion within the Genesys ecosystem.",
                 influence: [
-                    "Conducts regular business reviews to demonstrate ROI",
-                    "Aligns platform capabilities with evolving business goals",
-                    "Provides expert guidance, making the service indispensable"
+                    "Acts as a trusted advisor for strategic enterprise clients",
+                    "Identifies and implements complex, high-value solutions",
+                    "Ensures long-term partnership and growth within key accounts"
                 ],
-                impactScores: [7, 10, 3]
+                impactScores: [9, 7, 6, 5]
             }
         }
     },
-    satisfaction: {
-        id: 'satisfaction',
-        title: 'Satisfaction & Retention',
-        icon: '❤️',
+    drive_profitability: {
+        id: 'drive_profitability',
+        title: 'Drive Profitability Based on Data',
+        icon: '💰',
         metrics: {
-            nps: {
-                name: 'Net Promoter Score (NPS)',
-                description: "Configures Genesys solutions to directly improve the end-customer experience, leading to higher satisfaction and loyalty.",
+            non_gaap_operating_income: {
+                name: 'Non-GAAP Operating Income',
+                description: "Consultants optimize solution efficiency and resource utilization for clients, which indirectly contributes to Genesys's operational profitability by reducing support costs and improving project margins.",
                 influence: [
-                    "Designs superior customer journeys and interaction flows",
-                    "Optimizes routing strategies for better agent-customer matching",
-                    "Integrates systems for a seamless, omnichannel experience"
+                    "Streamlines client operations, reducing their costs",
+                    "Minimizes post-implementation support needs",
+                    "Ensures efficient use of Genesys platform features"
                 ],
-                impactScores: [4, 10, 6]
+                impactScores: [5, 10, 6, 4]
             },
-            csat: {
-                name: 'Customer Satisfaction (CSAT)',
-                description: "A direct measure of customer happiness, improved by efficient and effective interactions powered by a well-configured system.",
+            unlevered_free_cash_flow: {
+                name: 'Unlevered Free Cash Flow',
+                description: "By ensuring timely project delivery and successful client outcomes, consultants contribute to predictable revenue streams and efficient cash conversion for Genesys.",
                 influence: [
-                    "Implements self-service options that work effectively",
-                    "Reduces customer wait times through workforce optimization",
-                    "Ensures agents have the right information at the right time"
+                    "Accelerates project completion and invoicing cycles",
+                    "Reduces project overruns and associated costs",
+                    "Ensures client satisfaction, leading to prompt payments"
                 ],
-                impactScores: [3, 10, 7]
-            },
-            ces: {
-                name: 'Customer Effort Score (CES)',
-                description: "Evaluates the ease of customer interaction, which a consultant minimizes by streamlining processes and removing friction.",
-                influence: [
-                    "Automates simple tasks to reduce customer effort",
-                    "Simplifies IVR menus and interaction pathways",
-                    "Optimizes agent desktop for faster issue resolution"
-                ],
-                impactScores: [2, 9, 9]
-            },
-            fcr: {
-                name: 'First Call Resolution (FCR)',
-                description: "Optimizes workflows, routing, and agent tools to increase the percentage of issues resolved in the first contact.",
-                influence: [
-                    "Implements skill-based routing to connect customers to the right expert",
-                    "Provides agents with a unified view of the customer journey",
-                    "Analyzes interaction data to identify and fix process gaps"
-                ],
-                impactScores: [2, 8, 10]
+                impactScores: [6, 10, 5, 3]
             }
         }
     },
-    operational: {
-        id: 'operational',
-        title: 'Operational Efficiency',
-        icon: '⚙️',
+    pioneer_experiences: {
+        id: 'pioneer_experiences',
+        title: 'Pioneer Superior Experiences',
+        icon: '✨',
         metrics: {
-            margin: {
-                name: 'Gross / Net Margin',
-                description: "Effective project management ensures projects are delivered on time and within budget, improving the profitability of services.",
+            hit_financial_goals: {
+                name: 'Deterministically hit company financial goals',
+                description: "By aligning Genesys solutions with client's strategic objectives, consultants help clients achieve their own financial targets, which in turn supports Genesys's financial goals.",
                 influence: [
-                    "Manages project scope and resources efficiently",
-                    "Delivers projects on time and on budget",
-                    "Creates reusable assets and methodologies to speed up delivery"
+                    "Translates business goals into technical solutions",
+                    "Ensures measurable ROI for client investments",
+                    "Provides strategic guidance to optimize client's CX operations"
                 ],
-                impactScores: [6, 2, 10]
+                impactScores: [7, 6, 10, 5]
             },
-            implementation: {
-                name: 'Implementation Efficiency',
-                description: "Applies best practices and agile methodologies to reduce implementation times, positively impacting internal resource utilization.",
+            net_revenue_retention: {
+                name: 'Net Revenue Retention',
+                description: "Consultants play a vital role in ensuring existing customers not only stay but also expand their usage, driving net revenue retention through continuous value delivery.",
                 influence: [
-                    "Uses proven methodologies for faster deployment",
-                    "Trains client teams effectively for quicker ramp-up",
-                    "Avoids common pitfalls through experience and expertise"
+                    "Proactively identifies and addresses client challenges",
+                    "Showcases new features and their benefits to clients",
+                    "Builds strong, long-term relationships based on trust and value"
                 ],
-                impactScores: [4, 4, 10]
+                impactScores: [8, 9, 10, 6]
             },
-            utilization: {
-                name: 'Resource Utilization',
-                description: "Consultants are an invaluable source of client feedback, which can inform product development and improve future implementations.",
+            cx_ex_index: {
+                name: 'Customer Experience Index, Employee Experience Index',
+                description: "Directly impacts the end-customer and employee experience by designing and implementing intuitive, efficient, and effective contact center solutions.",
                 influence: [
-                    "Provides crucial feedback to the product development teams",
-                    "Identifies new use cases for existing features",
-                    "Contributes to the knowledge base, improving team efficiency"
+                    "Optimizes customer journeys for seamless interactions",
+                    "Enhances agent desktop and workflows for improved efficiency",
+                    "Implements analytics to identify and resolve CX/EX pain points"
                 ],
-                impactScores: [5, 3, 10]
-            },
-            cost_per_contact: {
-                name: 'Cost Per Contact',
-                description: "Drives down the cost of customer interactions by implementing automation and optimizing agent-handled conversations.",
+                impactScores: [5, 7, 10, 4]
+            }
+        }
+    },
+    lead_sustainably: {
+        id: 'lead_sustainably',
+        title: 'Lead Sustainably',
+        icon: '🌍',
+        metrics: {
+            tcv_influenced: {
+                name: 'TCV influenced or sustained',
+                description: "Consultants contribute to the Total Contract Value (TCV) by ensuring long-term client success, leading to renewals, expansions, and sustained partnerships.",
                 influence: [
-                    "Introduces and tunes bots for high-volume, low-complexity tasks",
-                    "Optimizes call routing to reduce handle time",
-                    "Improves agent efficiency with better tools and processes"
+                    "Builds enduring client relationships through consistent value",
+                    "Advises on future-proofing CX strategies with Genesys",
+                    "Ensures the long-term viability and scalability of client solutions"
                 ],
-                impactScores: [4, 6, 10]
+                impactScores: [7, 6, 8, 10]
             }
         }
     }
@@ -245,10 +232,10 @@ document.addEventListener('DOMContentLoaded', () => {
         impactChart = new Chart(chartCtx, {
             type: 'radar',
             data: {
-                labels: ['Sales & Growth', 'Satisfaction', 'Operational Efficiency'],
+                labels: ['Outgrow the Competition', 'Drive Profitability', 'Pioneer Superior Experiences', 'Lead Sustainably'],
                 datasets: [{
                     label: 'Consultant Impact',
-                    data: [0, 0, 0],
+                    data: [0, 0, 0, 0],
                     backgroundColor: 'rgba(2, 132, 199, 0.2)', // sky-600 with transparency
                     borderColor: 'rgb(2, 132, 199)',
                     pointBackgroundColor: 'rgb(2, 132, 199)',
@@ -281,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateChart(data = [0, 0, 0]) {
+    function updateChart(data = [0, 0, 0, 0]) {
         impactChart.data.datasets[0].data = data;
         impactChart.update();
     }
@@ -385,4 +372,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 </body>
 </html>
-
