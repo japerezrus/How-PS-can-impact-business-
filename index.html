@@ -1,25 +1,388 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>WebMessaging_1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive App: Genesys Business Metrics & Consultant Impact</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Calm Harmony (Stone, Slate, Amber, Sky) -->
+    <!-- Application Structure Plan: The SPA uses a two-column, interconnected dashboard structure. The left column allows users to select a metric category, then a specific metric. The right column dynamically updates to show the consultant's influence on the selected metric, including a radar chart visualizing the impact area. This structure was chosen to transform the report's linear information into an interactive cause-and-effect exploration, directly linking a business goal (the metric) to the consultant's value proposition (the influence), which is the core message of the source material. -->
+    <!-- Visualization & Content Choices: Report Info -> Key business metrics and consultant roles. Goal -> Show the relationship between metrics and consultant actions. Viz/Presentation Method -> Interactive lists for metrics (HTML/Tailwind/JS) and a dynamic content panel for influence points. A Radar Chart (Chart.js/Canvas) is used to visually summarize which primary business area (Growth, Satisfaction, Operations) a selected metric and the corresponding consultant actions most affect. Interaction -> User clicks a metric, the influence panel and radar chart update instantly. Justification -> This interactive model is more engaging and informative than static text, allowing users to explore the connections at their own pace. Library/Method -> Chart.js for visualization and Vanilla JS for all interactions and DOM manipulation. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .metric-item.active {
+            background-color: #0284c7; /* sky-600 */
+            color: white;
+            transform: scale(1.03);
+        }
+        .category-btn.active {
+            background-color: #1e293b; /* slate-800 */
+            color: white;
+        }
+    </style>
 </head>
-  <body style="background-image: url('pexels-miguel-á-padriñán-255379.jpg');">
-<header>
-<script type="text/javascript" charset="utf-8">
-  (function (g, e, n, es, ys) {
-    g['_genesysJs'] = e;
-    g[e] = g[e] || function () {
-      (g[e].q = g[e].q || []).push(arguments)
-    };
-    g[e].t = 1 * new Date();
-    g[e].c = es;
-    ys = document.createElement('script'); ys.async = 1; ys.src = n; ys.charset = 'utf-8'; document.head.appendChild(ys);
-  })(window, 'Genesys', 'https://apps.mypurecloud.de/genesys-bootstrap/genesys.min.js', {
-    environment: 'prod-euc1',
-    deploymentId: 'd115e30b-356a-4879-83fb-9bf0d16f6059'
-  });
+<body class="bg-slate-50 text-slate-700">
+
+    <div class="container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-2">Genesys Business Metrics & Consultant Impact</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">An interactive guide to understanding how Professional Services Consultants drive success by influencing key business metrics.</p>
+        </header>
+
+        <main class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            
+            <!-- Left Column: Metrics Explorer -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">1. Explore Business Metrics</h2>
+                <p class="mb-6 text-slate-600">Select a category to reveal its key metrics. Then, choose a specific metric to see the consultant's impact.</p>
+
+                <div id="category-selector" class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+                    <!-- Category buttons will be inserted here by JS -->
+                </div>
+                
+                <div id="metrics-list-container">
+                    <!-- Metric items will be dynamically inserted here by JS -->
+                </div>
+            </div>
+
+            <!-- Right Column: Consultant's Impact -->
+            <div class="bg-white p-6 rounded-xl shadow-md">
+                <h2 class="text-2xl font-bold text-slate-800 mb-4">2. See the Consultant's Impact</h2>
+                <div id="impact-content" class="transition-opacity duration-500">
+                    <div class="text-center py-12">
+                        <p class="text-slate-500">Select a metric from the left to begin.</p>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t pt-6">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Primary Impact Area</h3>
+                     <div class="chart-container">
+                        <canvas id="impactRadarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+<script>
+const appData = {
+    sales: {
+        id: 'sales',
+        title: 'Sales & Growth',
+        icon: '📈',
+        metrics: {
+            arr_mrr: {
+                name: 'ARR / MRR',
+                description: "Ensures full utilization of Genesys functionalities, maximizing client ROI and increasing the likelihood of renewal.",
+                influence: [
+                    "Drives product adoption and showcases value",
+                    "Develops long-term strategic roadmaps with the client",
+                    "Ensures initial implementation meets and exceeds expectations"
+                ],
+                impactScores: [10, 6, 4]
+            },
+            cltv: {
+                name: 'Customer Lifetime Value (CLTV)',
+                description: "By understanding client needs, the consultant identifies and communicates opportunities to expand the use of Genesys solutions.",
+                influence: [
+                    "Identifies up-sell and cross-sell opportunities",
+                    "Fosters a strategic partnership, increasing customer loyalty",
+                    "Helps clients scale their operations using more platform features"
+                ],
+                impactScores: [10, 8, 2]
+            },
+            churn: {
+                name: 'Churn Rate',
+                description: "Provides proactive support and effective solutions that address client pain points, improving satisfaction and reducing churn.",
+                influence: [
+                    "Proactively resolves technical and strategic challenges",
+                    "Ensures the solution continuously delivers value",
+                    "Acts as a trusted advisor, strengthening the client relationship"
+                ],
+                impactScores: [8, 10, 2]
+            },
+            renewal: {
+                name: 'Renewal Rate',
+                description: "Reflects customer satisfaction and the continuous value delivered by the platform, heavily influenced by consultant engagement.",
+                influence: [
+                    "Conducts regular business reviews to demonstrate ROI",
+                    "Aligns platform capabilities with evolving business goals",
+                    "Provides expert guidance, making the service indispensable"
+                ],
+                impactScores: [7, 10, 3]
+            }
+        }
+    },
+    satisfaction: {
+        id: 'satisfaction',
+        title: 'Satisfaction & Retention',
+        icon: '❤️',
+        metrics: {
+            nps: {
+                name: 'Net Promoter Score (NPS)',
+                description: "Configures Genesys solutions to directly improve the end-customer experience, leading to higher satisfaction and loyalty.",
+                influence: [
+                    "Designs superior customer journeys and interaction flows",
+                    "Optimizes routing strategies for better agent-customer matching",
+                    "Integrates systems for a seamless, omnichannel experience"
+                ],
+                impactScores: [4, 10, 6]
+            },
+            csat: {
+                name: 'Customer Satisfaction (CSAT)',
+                description: "A direct measure of customer happiness, improved by efficient and effective interactions powered by a well-configured system.",
+                influence: [
+                    "Implements self-service options that work effectively",
+                    "Reduces customer wait times through workforce optimization",
+                    "Ensures agents have the right information at the right time"
+                ],
+                impactScores: [3, 10, 7]
+            },
+            ces: {
+                name: 'Customer Effort Score (CES)',
+                description: "Evaluates the ease of customer interaction, which a consultant minimizes by streamlining processes and removing friction.",
+                influence: [
+                    "Automates simple tasks to reduce customer effort",
+                    "Simplifies IVR menus and interaction pathways",
+                    "Optimizes agent desktop for faster issue resolution"
+                ],
+                impactScores: [2, 9, 9]
+            },
+            fcr: {
+                name: 'First Call Resolution (FCR)',
+                description: "Optimizes workflows, routing, and agent tools to increase the percentage of issues resolved in the first contact.",
+                influence: [
+                    "Implements skill-based routing to connect customers to the right expert",
+                    "Provides agents with a unified view of the customer journey",
+                    "Analyzes interaction data to identify and fix process gaps"
+                ],
+                impactScores: [2, 8, 10]
+            }
+        }
+    },
+    operational: {
+        id: 'operational',
+        title: 'Operational Efficiency',
+        icon: '⚙️',
+        metrics: {
+            margin: {
+                name: 'Gross / Net Margin',
+                description: "Effective project management ensures projects are delivered on time and within budget, improving the profitability of services.",
+                influence: [
+                    "Manages project scope and resources efficiently",
+                    "Delivers projects on time and on budget",
+                    "Creates reusable assets and methodologies to speed up delivery"
+                ],
+                impactScores: [6, 2, 10]
+            },
+            implementation: {
+                name: 'Implementation Efficiency',
+                description: "Applies best practices and agile methodologies to reduce implementation times, positively impacting internal resource utilization.",
+                influence: [
+                    "Uses proven methodologies for faster deployment",
+                    "Trains client teams effectively for quicker ramp-up",
+                    "Avoids common pitfalls through experience and expertise"
+                ],
+                impactScores: [4, 4, 10]
+            },
+            utilization: {
+                name: 'Resource Utilization',
+                description: "Consultants are an invaluable source of client feedback, which can inform product development and improve future implementations.",
+                influence: [
+                    "Provides crucial feedback to the product development teams",
+                    "Identifies new use cases for existing features",
+                    "Contributes to the knowledge base, improving team efficiency"
+                ],
+                impactScores: [5, 3, 10]
+            },
+            cost_per_contact: {
+                name: 'Cost Per Contact',
+                description: "Drives down the cost of customer interactions by implementing automation and optimizing agent-handled conversations.",
+                influence: [
+                    "Introduces and tunes bots for high-volume, low-complexity tasks",
+                    "Optimizes call routing to reduce handle time",
+                    "Improves agent efficiency with better tools and processes"
+                ],
+                impactScores: [4, 6, 10]
+            }
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const categorySelector = document.getElementById('category-selector');
+    const metricsListContainer = document.getElementById('metrics-list-container');
+    const impactContent = document.getElementById('impact-content');
+    const chartCtx = document.getElementById('impactRadarChart').getContext('2d');
+
+    let activeCategory = null;
+    let activeMetric = null;
+    let impactChart;
+
+    function createRadarChart() {
+        impactChart = new Chart(chartCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Sales & Growth', 'Satisfaction', 'Operational Efficiency'],
+                datasets: [{
+                    label: 'Consultant Impact',
+                    data: [0, 0, 0],
+                    backgroundColor: 'rgba(2, 132, 199, 0.2)', // sky-600 with transparency
+                    borderColor: 'rgb(2, 132, 199)',
+                    pointBackgroundColor: 'rgb(2, 132, 199)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(2, 132, 199)'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                        pointLabels: { font: { size: 13 }, color: '#334155' },
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        ticks: {
+                            display: false,
+                            stepSize: 2
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    function updateChart(data = [0, 0, 0]) {
+        impactChart.data.datasets[0].data = data;
+        impactChart.update();
+    }
+
+    function displayCategories() {
+        categorySelector.innerHTML = '';
+        for (const key in appData) {
+            const category = appData[key];
+            const btn = document.createElement('button');
+            btn.className = 'category-btn w-full text-left p-4 rounded-lg bg-slate-100 hover:bg-slate-200 transition-all duration-300 flex items-center';
+            btn.dataset.categoryId = category.id;
+            btn.innerHTML = `<span class="text-2xl mr-3">${category.icon}</span> <span class="font-semibold">${category.title}</span>`;
+            btn.addEventListener('click', () => selectCategory(category.id));
+            categorySelector.appendChild(btn);
+        }
+    }
+
+    function selectCategory(categoryId) {
+        if (activeCategory === categoryId) return;
+        activeCategory = categoryId;
+        activeMetric = null;
+
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.categoryId === categoryId);
+        });
+
+        displayMetricsForCategory(categoryId);
+        updateImpactContent();
+        updateChart();
+    }
+    
+    function displayMetricsForCategory(categoryId) {
+        metricsListContainer.innerHTML = '';
+        const category = appData[categoryId];
+        const metrics = category.metrics;
+
+        const list = document.createElement('div');
+        list.className = 'space-y-3';
+
+        for (const key in metrics) {
+            const metric = metrics[key];
+            const item = document.createElement('button');
+            item.className = 'metric-item w-full text-left p-4 rounded-lg bg-slate-50 hover:bg-sky-100 transition-all duration-300 border border-slate-200';
+            item.dataset.metricId = key;
+            item.dataset.categoryId = categoryId;
+            item.innerHTML = `<span class="font-semibold text-slate-800">${metric.name}</span>`;
+            item.addEventListener('click', () => selectMetric(categoryId, key));
+            list.appendChild(item);
+        }
+        metricsListContainer.appendChild(list);
+    }
+    
+    function selectMetric(categoryId, metricId) {
+        activeCategory = categoryId;
+        activeMetric = metricId;
+
+        document.querySelectorAll('.metric-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.metricId === metricId && item.dataset.categoryId === categoryId);
+        });
+        
+        updateImpactContent(categoryId, metricId);
+        updateChart(appData[categoryId].metrics[metricId].impactScores);
+    }
+
+    function updateImpactContent(categoryId, metricId) {
+        if (!categoryId || !metricId) {
+            impactContent.innerHTML = `
+                <div class="text-center py-12">
+                    <p class="text-slate-500">Select a metric from the left to see details.</p>
+                </div>`;
+            return;
+        }
+
+        const metric = appData[categoryId].metrics[metricId];
+        let influenceHTML = metric.influence.map(point =>
+            `<li class="flex items-start">
+                <span class="text-sky-500 font-bold mr-3 mt-1">&#10003;</span>
+                <span>${point}</span>
+            </li>`
+        ).join('');
+
+        impactContent.innerHTML = `
+            <div>
+                <h3 class="text-xl font-bold text-sky-700 mb-2">${metric.name}</h3>
+                <p class="text-slate-600 mb-4">${metric.description}</p>
+                <h4 class="font-semibold text-slate-800 mb-2">Key Consultant Actions:</h4>
+                <ul class="space-y-2 text-slate-600">
+                    ${influenceHTML}
+                </ul>
+            </div>`;
+    }
+
+    function init() {
+        createRadarChart();
+        displayCategories();
+    }
+
+    init();
+});
 </script>
-<div id="genesys-support-center"></div>
-</header>
+
 </body>
-<html>
+</html>
+
