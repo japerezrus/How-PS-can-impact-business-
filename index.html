@@ -95,6 +95,7 @@ const appData = {
         metrics: {
             genesys_cloud_arr: {
                 name: 'Genesys Cloud ARR',
+                plainMeaning: "This is the money Genesys expects to get from its cloud software subscriptions over a year. It shows how much our cloud business is growing and how stable our income is.",
                 description: "Consultant ensures optimal adoption and expansion of Genesys Cloud services, directly contributing to recurring revenue growth.",
                 influence: [
                     "Accelerates cloud migration and adoption",
@@ -105,6 +106,7 @@ const appData = {
             },
             total_revenue: {
                 name: 'Total Revenue',
+                plainMeaning: "This is all the money Genesys earns from selling its products and services. It's the overall measure of our company's size and sales success.",
                 description: "Through strategic implementations and value realization, consultants help clients maximize their investment in Genesys solutions, leading to increased overall revenue for Genesys.",
                 influence: [
                     "Drives successful project completion, enabling invoicing",
@@ -115,6 +117,7 @@ const appData = {
             },
             gross_acv_bookings: {
                 name: 'Gross ACV Bookings',
+                plainMeaning: "This represents the total value of new contracts signed for our software and services in a year, before any cancellations or discounts. It indicates how much new business we're bringing in.",
                 description: "Consultants contribute to new sales and expansions by providing expert pre-sales support, solution design, and demonstrating clear ROI.",
                 influence: [
                     "Supports sales with compelling solution architectures",
@@ -125,6 +128,7 @@ const appData = {
             },
             customers_gt_1m_arr: {
                 name: 'Customers > $1M ARR',
+                plainMeaning: "This counts how many of our customers are spending more than $1 million per year on our cloud services. It shows our success in attracting and growing large, valuable clients.",
                 description: "Focuses on nurturing large accounts, ensuring their continued success and expansion within the Genesys ecosystem.",
                 influence: [
                     "Acts as a trusted advisor for strategic enterprise clients",
@@ -142,6 +146,7 @@ const appData = {
         metrics: {
             non_gaap_operating_income: {
                 name: 'Non-GAAP Operating Income',
+                plainMeaning: "This is the profit Genesys makes from its main business operations, without including certain one-time or non-cash costs. It shows how efficiently we're running our core business.",
                 description: "Consultants optimize solution efficiency and resource utilization for clients, which indirectly contributes to Genesys's operational profitability by reducing support costs and improving project margins.",
                 influence: [
                     "Streamlines client operations, reducing their costs",
@@ -152,6 +157,7 @@ const appData = {
             },
             unlevered_free_cash_flow: {
                 name: 'Unlevered Free Cash Flow',
+                plainMeaning: "This is the cash Genesys generates from its operations after paying for necessary business investments, before considering any debt payments. It shows how much cash the company has available to grow or pay back investors.",
                 description: "By ensuring timely project delivery and successful client outcomes, consultants contribute to predictable revenue streams and efficient cash conversion for Genesys.",
                 influence: [
                     "Accelerates project completion and invoicing cycles",
@@ -169,6 +175,7 @@ const appData = {
         metrics: {
             hit_financial_goals: {
                 name: 'Deterministically hit company financial goals',
+                plainMeaning: "This means consistently achieving the financial targets set for the company. It's about predictability and reliability in our financial performance.",
                 description: "By aligning Genesys solutions with client's strategic objectives, consultants help clients achieve their own financial targets, which in turn supports Genesys's financial goals.",
                 influence: [
                     "Translates business goals into technical solutions",
@@ -179,6 +186,7 @@ const appData = {
             },
             net_revenue_retention: {
                 name: 'Net Revenue Retention',
+                plainMeaning: "This measures how much revenue we keep from existing customers, including any upgrades or expansions, minus any cancellations. If it's over 100%, it means existing customers are spending more with us.",
                 description: "Consultants play a vital role in ensuring existing customers not only stay but also expand their usage, driving net revenue retention through continuous value delivery.",
                 influence: [
                     "Proactively identifies and addresses client challenges",
@@ -189,6 +197,7 @@ const appData = {
             },
             cx_ex_index: {
                 name: 'Customer Experience Index, Employee Experience Index',
+                plainMeaning: "These are scores that tell us how happy and satisfied our customers and our own employees are with their interactions and overall experience with Genesys and its products.",
                 description: "Directly impacts the end-customer and employee experience by designing and implementing intuitive, efficient, and effective contact center solutions.",
                 influence: [
                     "Optimizes customer journeys for seamless interactions",
@@ -206,6 +215,7 @@ const appData = {
         metrics: {
             tcv_influenced: {
                 name: 'TCV influenced or sustained',
+                plainMeaning: "This refers to the total value of contracts that Genesys consultants have helped to secure or keep over time. It shows their impact on the long-term revenue commitment from customers.",
                 description: "Consultants contribute to the Total Contract Value (TCV) by ensuring long-term client success, leading to renewals, expansions, and sustained partnerships.",
                 influence: [
                     "Builds enduring client relationships through consistent value",
@@ -353,6 +363,8 @@ document.addEventListener('DOMContentLoaded', () => {
         impactContent.innerHTML = `
             <div>
                 <h3 class="text-xl font-bold text-sky-700 mb-2">${metric.name}</h3>
+                <p class="text-slate-700 font-semibold mb-2">What it means:</p>
+                <p class="text-slate-600 mb-4">${metric.plainMeaning}</p>
                 <p class="text-slate-600 mb-4">${metric.description}</p>
                 <h4 class="font-semibold text-slate-800 mb-2">Key Consultant Actions:</h4>
                 <ul class="space-y-2 text-slate-600">
